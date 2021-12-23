@@ -12,6 +12,9 @@ class Question(models.Model):
     content = models.TextField()
     create_date = models.DateTimeField()
 
+    def __str__(self): # __repr__ will be preferred?
+        return self.subject
+
 class Answer(models.Model):
     """
     CREATE TABLE `pybo_answer` (
