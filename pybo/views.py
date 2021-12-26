@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
 
-from .forms import QuestionForm
+from .forms import QuestionForm, AnswerForm
 from .models import Question
 
 
@@ -31,14 +31,19 @@ def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
     """
     pybo 답변 등록
     """
-    print("wow")
     question = get_object_or_404(Question, pk=question_id)
-    # foreign key 로 연결되어있기 때문에 다음과 같이 new Answer 생성 가능.
-    question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
-    # Alternatively, direct creation through Answer class
-    # answer = Answer(question=question, content=request.POST.get('content'), create_date=timezone.now())
-    # answer.save()
-    return redirect('pybo:detail', question_id=question.id)
+    if request.method == 'POST':
+        form = AnswerForm(request.POST)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.create_date = timezone.now()
+            answer.question = question
+            answer.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        form = AnswerForm()
+    context = { 'question': question, 'form': form }
+    return render(request, 'pybo/question_detail.html', context)
 
 
 def question_create(request: HttpRequest) -> HttpResponse:
