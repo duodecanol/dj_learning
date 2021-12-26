@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
 
+from .forms import QuestionForm
 from .models import Question
 
 
@@ -38,3 +39,20 @@ def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
     # answer = Answer(question=question, content=request.POST.get('content'), create_date=timezone.now())
     # answer.save()
     return redirect('pybo:detail', question_id=question.id)
+
+
+def question_create(request: HttpRequest) -> HttpResponse:
+    """
+    pybo 질문 등록
+    """
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            question = form.save(commit=False)
+            question.create_date = timezone.now()
+            question.save()
+            return redirect('pybo:index')
+    else: # if method is  GET
+        form = QuestionForm()
+    context = { 'form': form }
+    return render(request, 'pybo/question_form.html', context)
