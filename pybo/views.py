@@ -33,7 +33,7 @@ def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
     print("wow")
     question = get_object_or_404(Question, pk=question_id)
     # foreign key 로 연결되어있기 때문에 다음과 같이 new Answer 생성 가능.
-    # question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
+    question.answer_set.create(content=request.POST.get('content'), create_date=timezone.now())
     # Alternatively, direct creation through Answer class
     # answer = Answer(question=question, content=request.POST.get('content'), create_date=timezone.now())
     # answer.save()
