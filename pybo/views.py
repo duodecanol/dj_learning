@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.views import generic
 
 from .forms import QuestionForm, AnswerForm
-from .models import Question
+from .models import Question, Answer
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -106,3 +106,25 @@ def question_delete(request: HttpRequest, question_id: int) -> HttpResponse:
         return redirect('pybo:detail', question_id=question.id)
     question.delete()
     return redirect('pybo:index')
+
+@login_required(login_url='common:login')
+def answer_modify(request: HttpRequest, answer_id: int) -> HttpResponse:
+    """
+    pybo 답변수정
+    """
+    answer = get_object_or_404(Answer, pk=answer_id)
+    if request.user != answer.author:
+        messages.error(request, "수정권한이 없습니다.")
+        return redirect('pybo:detail', question_id=answer.question.id)
+
+    if request.method == "POST":
+        form = AnswerForm(request.POST, instance=answer)
+        if form.is_valid():
+            answer = form.save(commit=False)
+            answer.modify_date = timezone.now()
+            answer.save()
+            return  redirect('pybo:detail', question_id=answer.question.id)
+    else:
+        form = AnswerForm(instance=answer)
+    context = { 'answer': answer, 'form': form }
+    return render(request, 'pybo/answer_form.html', context)
