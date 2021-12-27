@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.http import HttpResponse, HttpRequest
 from django.shortcuts import render, get_object_or_404, redirect
@@ -33,7 +34,7 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         return Question.objects.order_by('-create_date')
 
-
+@login_required(login_url='common:login')
 def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
     """
     pybo 답변 등록
@@ -53,7 +54,7 @@ def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
     context = { 'question': question, 'form': form }
     return render(request, 'pybo/question_detail.html', context)
 
-
+@login_required(login_url='common:login')
 def question_create(request: HttpRequest) -> HttpResponse:
     """
     pybo 질문 등록
