@@ -35,3 +35,24 @@ class Answer(models.Model):
     content = models.TextField()
     create_date = models.DateTimeField()
     modify_date = models.DateTimeField(null=True, blank=True)
+
+class Comment(models.Model):
+    """
+    CREATE TABLE `pybo_comment` (
+        `id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY,
+        `content` longtext NOT NULL,
+        `create_date` datetime(6) NOT NULL,
+        `modify_date` datetime(6) NULL,
+        `answer_id` bigint NULL,
+        `author_id` integer NOT NULL,
+        `question_id` bigint NULL);
+    ALTER TABLE `pybo_comment` ADD CONSTRAINT `pybo_comment_answer_id_f5379493_fk_pybo_answer_id` FOREIGN KEY (`answer_id`) REFERENCES `pybo_answer` (`id`);
+    ALTER TABLE `pybo_comment` ADD CONSTRAINT `pybo_comment_author_id_1ef9dc44_fk_auth_user_id` FOREIGN KEY (`author_id`) REFERENCES `auth_user` (`id`);
+    ALTER TABLE `pybo_comment` ADD CONSTRAINT `pybo_comment_question_id_811cb5c7_fk_pybo_question_id` FOREIGN KEY (`question_id`) REFERENCES `pybo_question` (`id`);
+    """
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    content = models.TextField()
+    create_date = models.DateTimeField()
+    modify_date = models.DateTimeField(null=True, blank=True)
+    question = models.ForeignKey(Question, null=True, blank=True, on_delete=models.CASCADE)
+    answer = models.ForeignKey(Answer, null=True, blank=True, on_delete=models.CASCADE)
