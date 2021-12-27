@@ -13,6 +13,9 @@ class Question(models.Model):
     subject = models.CharField(max_length=200)
     content = models.TextField()
     create_date = models.DateTimeField()
+    modify_date = models.DateTimeField(null=True, blank=True)
+    # null=True는 데이터베이스에서 modify_date 칼럼에 null을 허용한다는 의미이며,
+    # blank=True는 form.is_valid()를 통한 입력 데이터 검사 시 값이 없어도 된다는 의미이다
 
     def __str__(self): # __repr__ will be preferred?
         return self.subject
@@ -31,3 +34,4 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.TextField()
     create_date = models.DateTimeField()
+    modify_date = models.DateTimeField(null=True, blank=True)
