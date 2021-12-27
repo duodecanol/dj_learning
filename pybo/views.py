@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.views import generic
 
+from common.forms import CommentForm
 from .forms import QuestionForm, AnswerForm
 from .models import Question, Answer
 
@@ -140,3 +141,31 @@ def answer_delete(request: HttpRequest, answer_id: int) -> HttpResponse:
     else:
         answer.delete()
     return redirect('pybo:detail', question_id=answer.question.id)
+
+@login_required(login_url='common:login')
+def comment_create_question(request: HttpRequest, question_id: int) -> HttpResponse:
+    """
+    pybo 질문 댓글 등록
+    """
+    question = get_object_or_404(Question, pk=question_id)
+    if request.method == "POST":
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.create_date = timezone.now()
+            comment.question = question
+            comment.save()
+            return redirect('pybo:detail', question_id=question.id)
+    else:
+        form = CommentForm()
+    context =  { 'form': form }
+    return render(request, 'pybo/comment_form.html', context)
+
+@login_required(login_url='common:login')
+def comment_modify_question():
+    return None
+
+@login_required(login_url='common:login')
+def comment_delete_question():
+    return None
