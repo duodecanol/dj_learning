@@ -128,3 +128,15 @@ def answer_modify(request: HttpRequest, answer_id: int) -> HttpResponse:
         form = AnswerForm(instance=answer)
     context = { 'answer': answer, 'form': form }
     return render(request, 'pybo/answer_form.html', context)
+
+@login_required(login_url='common:login')
+def answer_delete(request: HttpRequest, answer_id: int) -> HttpResponse:
+    """
+    pybo 답변삭제
+    """
+    answer = get_object_or_404(Answer, pk=answer_id)
+    if request.user != answer.author:
+        messages.error(request, '삭제권한이 없습니다.')
+    else:
+        answer.delete()
+    return redirect('pybo:detail', question_id=answer.question.id)
