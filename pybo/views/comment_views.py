@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render, get_object_or_404, resolve_url
 from django.utils import timezone
 
 from ..forms import CommentForm
@@ -22,7 +22,9 @@ def comment_create_question(request: HttpRequest, question_id: int) -> HttpRespo
             comment.create_date = timezone.now()
             comment.question = question
             comment.save()
-            return redirect('pybo:detail', question_id=question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.question.id), comment.id
+            ))
     else:
         form = CommentForm()
     context =  { 'form': form }
@@ -44,7 +46,9 @@ def comment_modify_question(request: HttpRequest, comment_id: int) -> HttpRespon
             comment = form.save(commit=False)
             comment.modify_date = timezone.now()
             comment.save()
-            return redirect('pybo:detail', question_id=comment.question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.question.id), comment.id
+            ))
     else:
         form = CommentForm(instance=comment)
     context = { 'form': form }
@@ -74,7 +78,9 @@ def comment_create_answer(request: HttpRequest, answer_id: int) -> HttpResponse:
             comment.create_date = timezone.now()
             comment.answer = answer
             comment.save()
-            return redirect('pybo:detail', question_id=comment.answer.question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.answer.question.id), comment.id
+            ))
     else:
         form = CommentForm()
     context = { 'form': form }
@@ -96,7 +102,9 @@ def comment_modify_answer(request: HttpRequest, comment_id: int) -> HttpResponse
             comment = form.save(commit=False)
             comment.modify_date = timezone.now()
             comment.save()
-            return redirect('pybo:detail', question_id=comment.answer.question.id)
+            return redirect('{}#comment_{}'.format(
+                resolve_url('pybo:detail', question_id=comment.answer.question.id), comment.id
+            ))
     else:
         form = CommentForm(instance=comment)
     context = { 'form': form }
