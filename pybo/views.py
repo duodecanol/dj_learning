@@ -43,6 +43,7 @@ def answer_create(request: HttpRequest, question_id: int) -> HttpResponse:
         form = AnswerForm(request.POST)
         if form.is_valid():
             answer = form.save(commit=False)
+            answer.author = request.user # author attr
             answer.create_date = timezone.now()
             answer.question = question
             answer.save()
@@ -61,6 +62,7 @@ def question_create(request: HttpRequest) -> HttpResponse:
         form = QuestionForm(request.POST)
         if form.is_valid():
             question = form.save(commit=False)
+            question.author = request.user # author attr
             question.create_date = timezone.now()
             question.save()
             return redirect('pybo:index')
